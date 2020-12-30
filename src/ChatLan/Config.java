@@ -20,6 +20,7 @@ public class Config {
 		frame.setTitle(title);
 		frame.setBounds(300, 200, 800, 450);
 		frame.setDefaultCloseOperation(3);
+		frame.setResizable(false);
 		frame.add(panel);
 		frame.setVisible(true);
 	}

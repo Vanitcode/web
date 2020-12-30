@@ -26,11 +26,9 @@ public class Client {
 
 		clientPanel client_panel = new clientPanel();
 		
-		Config prueba = new Config("VanitCode   -   Cliente", client_panel);
+		Config cliente = new Config("VanitCode   -   Cliente", client_panel);
 	}
 
-	private JTextField nick, ip;
-	private JTextArea areaChat;
 }
 
 class clientPanel extends JPanelConfig implements Runnable{
@@ -55,7 +53,7 @@ class clientPanel extends JPanelConfig implements Runnable{
 						// TODO Auto-generated method stub
 						
 						try {
-							Socket miSocket = new Socket("192.168.0.119",9999);
+							Socket miSocket = new Socket("192.168.0.119",9999); //Host,port
 							
 							EnvioPaqueteDatos datos = new EnvioPaqueteDatos();
 							datos.setNick(nick.getText());
