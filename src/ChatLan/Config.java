@@ -3,7 +3,11 @@ package ChatLan;
 import java.awt.BorderLayout;
 import java.awt.Image;
 import java.awt.Toolkit;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.net.Socket;
+import java.net.UnknownHostException;
 
 import javax.swing.Box;
 import javax.swing.ImageIcon;
@@ -23,6 +27,22 @@ public class Config {
 		frame.setResizable(false);
 		frame.add(panel);
 		frame.setVisible(true);
+	}
+	
+	void connected() {
+		try {
+			Socket miSocket = new Socket("192.168.0.119",9999);
+			EnvioPaqueteDatos datos = new EnvioPaqueteDatos();
+			datos.setTextoCliente(" online");
+			ObjectOutputStream flujoSalidaPaquete = new ObjectOutputStream(miSocket.getOutputStream());
+			flujoSalidaPaquete.writeObject(datos);
+		} catch (UnknownHostException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 }
 

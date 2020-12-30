@@ -12,7 +12,9 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -27,6 +29,7 @@ public class Client {
 		clientPanel client_panel = new clientPanel();
 		
 		Config cliente = new Config("VanitCode   -   Cliente", client_panel);
+		cliente.connected();
 	}
 
 }
@@ -38,9 +41,13 @@ class clientPanel extends JPanelConfig implements Runnable{
 				//Mejor evitar que se pueda maximizar
 				JPanel central_panel = new JPanel();
 				JPanel north_panel = new JPanel();
-				nick = new JTextField(5);
-				ip = new JTextField(8);
-				JLabel et1 = new JLabel("Chat");
+				nick = new JLabel();
+				nick.setText(JOptionPane.showInputDialog("Introduzca su nick"));
+				ip = new JComboBox();
+				ip.addItem("Jose");
+				ip.addItem("Maria");
+				ip.addItem("Antonio");
+				JLabel et1 = new JLabel("  ONLINE -> ");
 				JTextArea texto_cliente = new JTextArea(4,24);
 				JScrollPane scroll_text_cl = new JScrollPane(texto_cliente);
 				JButton enviar = new JButton("Send");
@@ -57,7 +64,7 @@ class clientPanel extends JPanelConfig implements Runnable{
 							
 							EnvioPaqueteDatos datos = new EnvioPaqueteDatos();
 							datos.setNick(nick.getText());
-							datos.setIp(ip.getText());
+							datos.setIp(ip.getSelectedItem().toString());
 							datos.setTextoCliente(texto_cliente.getText());
 							
 							//Lo siguiente se puede hacer porque es Serializable
@@ -122,6 +129,7 @@ class clientPanel extends JPanelConfig implements Runnable{
 		}
 	}
 	
-	private JTextField nick, ip;
+	private JComboBox ip;
+	private JLabel nick;
 	private JTextArea areaChat;
 }

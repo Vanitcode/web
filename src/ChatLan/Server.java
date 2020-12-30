@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -52,6 +53,9 @@ class serverPanel extends JPanelConfig implements Runnable{
 			//No consume recursos porque al igual que se abren se cierran
 			while(true) {
 				Socket miSocket = miServidor.accept();//Acepta las conexiones al puerto 9999
+				
+				InetAddress dirClients = miSocket.getInetAddress();
+				String ipOnlineClients = dirClients.getHostAddress();
 				
 				ObjectInputStream flujoDatosEntrada = new ObjectInputStream(miSocket.getInputStream());
 				
