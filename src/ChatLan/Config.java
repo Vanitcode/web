@@ -8,6 +8,7 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 
 import javax.swing.Box;
 import javax.swing.ImageIcon;
@@ -29,11 +30,12 @@ public class Config {
 		frame.setVisible(true);
 	}
 	
-	void connected() {
+	void connected(String nick) {
 		try {
 			Socket miSocket = new Socket("192.168.0.119",9999);
 			EnvioPaqueteDatos datos = new EnvioPaqueteDatos();
 			datos.setTextoCliente(" online");
+			datos.setNick(nick);
 			ObjectOutputStream flujoSalidaPaquete = new ObjectOutputStream(miSocket.getOutputStream());
 			flujoSalidaPaquete.writeObject(datos);
 		} catch (UnknownHostException e) {
@@ -68,6 +70,15 @@ class JPanelConfig extends JPanel{
 class EnvioPaqueteDatos implements Serializable{ //Para que sea susceptible de serializarse y poder enviar el paquete
 	
 	private String nick, ip, textoCliente;
+	private ArrayList<String> IPs;
+
+	public ArrayList<String> getIPs() {
+		return IPs;
+	}
+
+	public void setIPs(ArrayList<String> iPs) {
+		IPs = iPs;
+	}
 
 	public String getNick() {
 		return nick;

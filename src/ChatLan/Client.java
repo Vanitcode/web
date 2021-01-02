@@ -10,6 +10,7 @@ import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -26,33 +27,33 @@ public class Client {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 
-		clientPanel client_panel = new clientPanel();
+		String nick = JOptionPane.showInputDialog("Introduzca su nick");
+		clientPanel client_panel = new clientPanel(nick);
 		
 		Config cliente = new Config("VanitCode   -   Cliente", client_panel);
-		cliente.connected();
+		
+		cliente.connected(nick);
 	}
 
 }
 
 class clientPanel extends JPanelConfig implements Runnable{
 	
-	public clientPanel() {
+	public clientPanel(String nick) {
 		super();
-				//Mejor evitar que se pueda maximizar
+				
 				JPanel central_panel = new JPanel();
 				JPanel north_panel = new JPanel();
-				nick = new JLabel();
-				nick.setText(JOptionPane.showInputDialog("Introduzca su nick"));
+				nickPanel = new JLabel();
+				nickPanel.setText(nick);
 				ip = new JComboBox();
-				ip.addItem("Jose");
-				ip.addItem("Maria");
-				ip.addItem("Antonio");
 				JLabel et1 = new JLabel("  ONLINE -> ");
 				JTextArea texto_cliente = new JTextArea(4,24);
 				JScrollPane scroll_text_cl = new JScrollPane(texto_cliente);
 				JButton enviar = new JButton("Send");
-				//enviar.setPreferredSize(new Dimension(15,2));
+				
 				areaChat = new JTextArea(10,30);
+				areaChat.setEditable(false);
 				enviar.addActionListener(new ActionListener() {
 
 					@Override
@@ -63,7 +64,7 @@ class clientPanel extends JPanelConfig implements Runnable{
 							Socket miSocket = new Socket("192.168.0.119",9999); //Host,port
 							
 							EnvioPaqueteDatos datos = new EnvioPaqueteDatos();
-							datos.setNick(nick.getText());
+							datos.setNick(nickPanel.getText());
 							datos.setIp(ip.getSelectedItem().toString());
 							datos.setTextoCliente(texto_cliente.getText());
 							
@@ -89,7 +90,7 @@ class clientPanel extends JPanelConfig implements Runnable{
 					
 				});
 				
-				north_panel.add(nick);
+				north_panel.add(nickPanel);
 				north_panel.add(et1);
 				north_panel.add(ip);
 				central_panel.add(areaChat);
@@ -117,7 +118,16 @@ class clientPanel extends JPanelConfig implements Runnable{
 				ObjectInputStream flujoEntrada = new ObjectInputStream (cliente.getInputStream());
 				paqueteRecibido = (EnvioPaqueteDatos) flujoEntrada.readObject();
 				
-				areaChat.append("\n" + paqueteRecibido.getNick() + ": " + paqueteRecibido.getTextoCliente());
+				if(paqueteRecibido.getTextoCliente().equals(" online")) {
+					ArrayList<String> IPsJCombo = new ArrayList<String>();
+					IPsJCombo = paqueteRecibido.getIPs();
+					ip.removeAllItems();
+					
+					for(String ips: IPsJCombo) ip.addItem(ips);
+				}
+				else{
+					areaChat.append("\n" + paqueteRecibido.getNick() + ": " + paqueteRecibido.getTextoCliente());
+				}
 			}
 			
 		} catch (IOException e) {
@@ -130,6 +140,6 @@ class clientPanel extends JPanelConfig implements Runnable{
 	}
 	
 	private JComboBox ip;
-	private JLabel nick;
+	private JLabel nickPanel;
 	private JTextArea areaChat;
 }

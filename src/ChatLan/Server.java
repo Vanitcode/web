@@ -7,6 +7,7 @@ import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -46,6 +47,7 @@ class serverPanel extends JPanelConfig implements Runnable{
 			ServerSocket miServidor = new ServerSocket(9999); // Puerto a la escucha
 			
 			String nick, ip, mensaje;
+			ArrayList<String> ipOnlineList = new ArrayList<String>();
 			
 			EnvioPaqueteDatos paqueteRecibido;
 			
@@ -53,9 +55,6 @@ class serverPanel extends JPanelConfig implements Runnable{
 			//No consume recursos porque al igual que se abren se cierran
 			while(true) {
 				Socket miSocket = miServidor.accept();//Acepta las conexiones al puerto 9999
-				
-				InetAddress dirClients = miSocket.getInetAddress();
-				String ipOnlineClients = dirClients.getHostAddress();
 				
 				ObjectInputStream flujoDatosEntrada = new ObjectInputStream(miSocket.getInputStream());
 				
@@ -65,19 +64,41 @@ class serverPanel extends JPanelConfig implements Runnable{
 				ip = paqueteRecibido.getIp();
 				mensaje = paqueteRecibido.getTextoCliente();
 				
-				texto_servidor.append("\n" + "nick: " + nick + " Mensaje: " + mensaje + "IP: " + ip);
-				
-				
-				//Vamos a enviar el paquete recibido. Primero el Scket de salida
-				Socket reenvioDestinatario= new Socket(ip, 9090);
-				//Segundo, el flujo. Un ObjectStream
-				ObjectOutputStream paqueteReenvio = new ObjectOutputStream(reenvioDestinatario.getOutputStream());
-				//Tercero, escribimos el Objeto que tiene que viajar
-				paqueteReenvio.writeObject(paqueteRecibido);
-				
-				
-				reenvioDestinatario.close();
-				miSocket.close();
+				if(!mensaje.equals(" online")) {
+					
+					texto_servidor.append("\n" + "nick: " + nick + " Mensaje: " + mensaje + " IP: " + ip);
+					
+					//Vamos a enviar el paquete recibido. Primero el Scket de salida
+					Socket reenvioDestinatario= new Socket(ip, 9090);
+					//Segundo, el flujo. Un ObjectStream
+					ObjectOutputStream paqueteReenvio = new ObjectOutputStream(reenvioDestinatario.getOutputStream());
+					//Tercero, escribimos el Objeto que tiene que viajar
+					paqueteReenvio.writeObject(paqueteRecibido);
+					
+					
+					reenvioDestinatario.close();
+					miSocket.close();
+					
+			}else {				
+					InetAddress dirClients = miSocket.getInetAddress();
+					String ipOnlineClients = dirClients.getHostAddress();
+					ipOnlineList.add(ipOnlineClients);
+					texto_servidor.append(ipOnlineClients + " is online. Alias: " + nick);
+					paqueteRecibido.setIPs(ipOnlineList);
+					for(String ips: ipOnlineList) {
+						
+						System.out.println("ArrayList: " + ips);
+						Socket reenvioDestinatario= new Socket(ips, 9090);
+						//Segundo, el flujo. Un ObjectStream
+						ObjectOutputStream paqueteReenvio = new ObjectOutputStream(reenvioDestinatario.getOutputStream());
+						//Tercero, escribimos el Objeto que tiene que viajar
+						paqueteReenvio.writeObject(paqueteRecibido);
+						
+						
+						reenvioDestinatario.close();
+						miSocket.close();
+					}
+			}
 			}
 			
 		} catch (IOException e) {
